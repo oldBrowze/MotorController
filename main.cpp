@@ -20,6 +20,8 @@
 #include "qei_core.h"
 #include "pwm_core.h"
 #include "adc_core.h"
+#include "ports_core.h"
+
 
 //инициализация тактирования всей периферии
 inline void sysclk_init()
@@ -39,6 +41,7 @@ inline void sysclk_init()
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);                                                // тактируем GPIOC
     SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);                                                // тактируем UART
     SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);                                                 // тактируем ADC0
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC1);                                                 // тактируем ADC0
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);                                                // тактируем GPIOA
 }
 
@@ -68,15 +71,18 @@ int main()
     PWM::pwm_init();
     QEI::qei_init();
     ADC::ADC_init();
+    PORTS::ports_init();
     //interrupt_init();
 
 
     while(true)
     {
+        /*
         ADCProcessorTrigger(ADC0_BASE, ADC::voltage_sequencer);
         while(ADCBusy(ADC0_BASE));
 
         ADCSequenceDataGet(ADC0_BASE, ADC::voltage_sequencer, ADC::adc0_voltage_buffer);
         UARTprintf("ADC value AIN0-AIN1 = %u\n", ADC::transform_adc_value_to_width());
+        */
     }
 }
