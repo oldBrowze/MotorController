@@ -1,10 +1,3 @@
-/*
- * adc_core.h
- *
- *  Created on: 1 мая 2022 г.
- *      Author: oldbrowze
- */
-
 #ifndef INCLUDE_ADC_CORE_H_
 #define INCLUDE_ADC_CORE_H_
 
@@ -24,17 +17,17 @@ namespace ADC
 
 uint32_t transform_adc_value_to_width();
 
-//занимает AIN0, AIN1
-constexpr auto voltage_sequencer    = 2;    // напряжение якоря
+//РєР°РЅР°Р»С‹ AIN0, AIN1
+constexpr auto voltage_sequencer    = 2;
 
-//занимает AIN2, AIN3
-constexpr auto current0_sequencer   = 1;    // ток якоря
+//РєР°РЅР°Р»С‹ AIN2, AIN3
+constexpr auto current0_sequencer   = 1;
 
-//занимает AIN4
-constexpr auto speed_sequencer      = 3;    // задание скорости
+//РєР°РЅР°Р» AIN4
+constexpr auto speed_sequencer      = 3;
 
-//занимает AIN6, AIN7
-constexpr auto current1_sequencer   = 2;    // ток возбуждения
+//РєР°РЅР°Р»С‹ AIN6, AIN7
+constexpr auto current1_sequencer   = 2;
 
 constexpr auto max_value_adc        = (1 << 12) - 1;
 
@@ -52,9 +45,9 @@ constexpr uint32_t get_size_buffer(const uint8_t sequencer)
     return 0;
 }
 
-uint32_t adc0_voltage_buffer[get_size_buffer(voltage_sequencer)];   //буфер значений напряжений
-uint32_t adc0_current0_buffer[get_size_buffer(current0_sequencer)]; //буфер значений тока якоря
-uint32_t adc0_current1_buffer[get_size_buffer(current1_sequencer)]; //буфер значений тока возбужедния
+uint32_t adc0_voltage_buffer[get_size_buffer(voltage_sequencer)];   //Р±СѓС„РµСЂ РЅР°РїСЂСЏР¶РµРЅРёСЏ СЏРєРѕСЂСЏ
+uint32_t adc0_current0_buffer[get_size_buffer(current0_sequencer)]; //Р±СѓС„РµСЂ С‚РѕРєР° СЏРєРѕСЂСЏ
+uint32_t adc0_current1_buffer[get_size_buffer(current1_sequencer)]; //Р±СѓС„РµСЂ С‚РѕРєР° РІРѕР·Р±СѓР¶РґРµРЅРёСЏ
 
 uint32_t transform_adc_value_to_width()
 {
@@ -75,7 +68,7 @@ inline void ADC_init()
     GPIOPinTypeADC(GPIO_PORTD_BASE, GPIO_PIN_3 | GPIO_PIN_0 | GPIO_PIN_1);                                   // AIN4,6,7
 
 
-    GPIOPinConfigure(GPIO_PCTL_PE1_AIN2);                                                                    // конфигурация портов как AFIO
+    GPIOPinConfigure(GPIO_PCTL_PE1_AIN2);                                                                    // РєРѕРЅС„РёРіСѓСЂР°С†РёСЏ РєР°Рє AFIO
     GPIOPinConfigure(GPIO_PCTL_PE0_AIN3);
 
     GPIOPinConfigure(GPIO_PCTL_PE3_AIN0);
@@ -89,13 +82,13 @@ inline void ADC_init()
 
 
     //ADCClockConfigSet(ADC0_BASE, ADC_CLOCK_SRC_PIOSC | ADC_CLOCK_RATE_FULL, 1);
-    ADCHardwareOversampleConfigure(ADC0_BASE, 4);                                                           // аппаратное усреднение
-    ADCHardwareOversampleConfigure(ADC1_BASE, 4);                                                           // аппаратное усреднение
+    ADCHardwareOversampleConfigure(ADC0_BASE, 4);                                                           // Р°РїРїР°СЂР°С‚РЅС‹Р№ РѕРІРµСЂСЃРµРјРїР»
+    ADCHardwareOversampleConfigure(ADC1_BASE, 4);
 
-    ADCReferenceSet(ADC0_BASE, ADC_REF_INT);                                                                // опорное напряжение - 3.3 V
-    ADCReferenceSet(ADC1_BASE, ADC_REF_INT);                                                                // опорное напряжение - 3.3 V
+    ADCReferenceSet(ADC0_BASE, ADC_REF_INT);                                                                // РѕРїРѕСЂРЅРѕРµ РЅР°РїСЂСЏР¶РµРЅРёРµ - 3.3 V
+    ADCReferenceSet(ADC1_BASE, ADC_REF_INT);
 
-    //если ADC_TRIGGER_ALWAYS, то нельзя ставить 0
+    //РµСЃР»Рё ADC_TRIGGER_ALWAYS, С‚Рѕ РїСЂРёРѕСЂРёС‚РµС‚ != 0
     ADCSequenceConfigure(ADC0_BASE, voltage_sequencer, ADC_TRIGGER_PROCESSOR, 1);
     ADCSequenceConfigure(ADC0_BASE, current0_sequencer, ADC_TRIGGER_PROCESSOR, 2);
     ADCSequenceConfigure(ADC0_BASE, speed_sequencer, ADC_TRIGGER_PROCESSOR, 0);

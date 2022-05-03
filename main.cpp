@@ -23,33 +23,33 @@
 #include "ports_core.h"
 
 
-//инициализация тактирования всей периферии
+
 inline void sysclk_init()
 {
-    SysCtlClockSet(SYSCTL_USE_PLL |                                                             // тактирование МК
+    SysCtlClockSet(SYSCTL_USE_PLL |
                    SYSCTL_OSC_MAIN |
                    SYSCTL_XTAL_16MHZ |
                    SYSCTL_SYSDIV_2_5);
 
-    SysCtlPWMClockSet(SYSCTL_PWMDIV_1);                                                         // частота PWM = Fcpu
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_PWM0);                                                 // тактируем PWM
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);                                                // тактируем GPIOB
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_QEI0);                                                 // тактируем QEI0
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_QEI1);                                                 // тактируем QEI1
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);                                                // тактируем GPIOD
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);                                                // тактируем GPIOE
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);                                                // тактируем GPIOC
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);                                                // тактируем UART
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);                                                 // тактируем ADC0
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC1);                                                 // тактируем ADC0
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);                                                // тактируем GPIOA
+    SysCtlPWMClockSet(SYSCTL_PWMDIV_1);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_PWM0);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_QEI0);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_QEI1);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC1);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
 }
 
 inline void interrupt_init()
 {
-    IntMasterEnable();                                                                          // разрешаем обработку прерываний
-    IntEnable(INT_QEI0);                                                                        // включаем прерывание QEI0
-    IntEnable(INT_QEI1);                                                                        // включаем прерывание QEI1
+    IntMasterEnable();
+    IntEnable(INT_QEI0);
+    IntEnable(INT_QEI1);
 }
 
 

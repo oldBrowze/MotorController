@@ -1,10 +1,3 @@
-/*
- * ports_core.h
- *
- *  Created on: 3 мая 2022 г.
- *      Author: oldbrowze
- */
-
 #ifndef INCLUDE_PORTS_CORE_H_
 #define INCLUDE_PORTS_CORE_H_
 
