@@ -11,18 +11,18 @@
 #include <inc/hw_gpio.h>
 #include <inc/hw_types.h>
 #include <driverlib/uart.h>
-
+//#include <inc/hw_ints.h>
 
 
 #include "utils/uartstdio.h"
 
 //user-defined include
-#include "qei_core.h"
-#include "pwm_core.h"
-#include "adc_core.h"
-#include "ports_core.h"
-
-
+#include "inc/adc_core.h"
+#include "inc/ports_core.h"
+#include "inc/pwm_core.h"
+#include "inc/qei_core.h"
+#include "inc/tm4c123_ps2.h"
+#include "inc/rs485.h"
 
 inline void sysclk_init()
 {
@@ -40,18 +40,54 @@ inline void sysclk_init()
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART7);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC1);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
 }
 
-inline void interrupt_init()
+void button_handler()
 {
-    IntMasterEnable();
-    IntEnable(INT_QEI0);
-    IntEnable(INT_QEI1);
+
+    /*
+     * Для проверки стенда
+     *
+     */
+
+    uint32_t status = GPIOIntStatus(GPIO_PORTF_BASE, true);
+    GPIOIntClear(GPIO_PORTF_BASE, status);
+
+    /*
+    if(status & GPIO_INT_PIN_4)
+        PWM::pulse_width = (PWM::pulse_width < 90) ? PWM::pulse_width + 10 : 90;
+    else if(status & GPIO_INT_PIN_0)
+        PWM::pulse_width = (PWM::pulse_width > 10) ? PWM::pulse_width - 10 : 10;
+
+    PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, PWM::get_normalize_width(PWM::pulse_width));
+    */
+
+
+    /*
+    Для проверки дискретных выводов
+    GPIOPinWrite(PORTS::gpio_base, PORTS::gpio_pin_contactor,  ~GPIOPinRead(PORTS::gpio_base, PORTS::gpio_pin_contactor));
+    GPIOPinWrite(PORTS::gpio_base, PORTS::gpio_pin_brake,  ~GPIOPinRead(PORTS::gpio_base, PORTS::gpio_pin_brake));
+    */
+
+
+
+    //ADCProcessorTrigger(ADC0_BASE, ADC::speed_sequencer); для вызова
+    //ADCProcessorTrigger(ADC0_BASE, ADC::voltage_sequencer);
+    //ADCProcessorTrigger(ADC0_BASE, ADC::current_anchor_sequencer);
+    //ADCProcessorTrigger(ADC0_BASE, ADC::current_winding_sequencer);
+
+    UARTprintf("%x\n", PS2::get_value_from_buffer());
 }
 
+void crSet(unsigned int base, unsigned char value)
+{
+    unsigned long v = (HWREG(GPIO_PORTF_BASE + GPIO_O_CR) & 0xFFFFFF00) | value;
+    HWREG(base + GPIO_O_CR) = v;
+}
 
 
 int main()
@@ -64,7 +100,6 @@ int main()
     GPIOPinConfigure(GPIO_PA1_U0TX);
     GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
 
-    //UARTClockSourceSet(UART0_BASE, UART_CLOCK_PIOSC);
     UARTStdioConfig(0, 115200, SysCtlClockGet());
     UARTprintf("UART is init\n");
 
@@ -72,17 +107,23 @@ int main()
     QEI::qei_init();
     ADC::ADC_init();
     PORTS::ports_init();
-    //interrupt_init();
 
+    PS2::init();
 
-    while(true)
-    {
-        /*
-        ADCProcessorTrigger(ADC0_BASE, ADC::voltage_sequencer);
-        while(ADCBusy(ADC0_BASE));
+    GPIOPinTypeGPIOInput(GPIO_PORTF_BASE, GPIO_PIN_0 | GPIO_PIN_4);
 
-        ADCSequenceDataGet(ADC0_BASE, ADC::voltage_sequencer, ADC::adc0_voltage_buffer);
-        UARTprintf("ADC value AIN0-AIN1 = %u\n", ADC::transform_adc_value_to_width());
-        */
-    }
+    //разблокировка PF0
+    HWREG(GPIO_PORTF_BASE + GPIO_O_LOCK) = GPIO_LOCK_KEY;
+    crSet(GPIO_PORTF_BASE, 1);
+    GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_0 | GPIO_PIN_4, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+    crSet(GPIO_PORTF_BASE, 0);
+    HWREG(GPIO_PORTF_BASE + GPIO_O_LOCK) = 0;
+
+    GPIOIntRegister(GPIO_PORTF_BASE, button_handler);
+    GPIOIntTypeSet(GPIO_PORTF_BASE, GPIO_PIN_0 | GPIO_PIN_4, GPIO_FALLING_EDGE);
+    GPIOIntEnable(GPIO_PORTF_BASE, GPIO_PIN_0 | GPIO_PIN_4);
+    IntEnable(INT_GPIOF);
+    IntPrioritySet(INT_GPIOF, 0);
+
+    while(true){}
 }

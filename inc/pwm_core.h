@@ -5,16 +5,18 @@
  *      Author: oldbrowze
  */
 
-#ifndef INCLUDE_PWM_CORE_H_
-#define INCLUDE_PWM_CORE_H_
+#ifndef INC_PWM_CORE_H_
+#define INC_PWM_CORE_H_
 
 
 namespace PWM
 {
 
 constexpr uint32_t F_CPU                = 80000000;
-constexpr auto _FREQUENCY               = 20000;
+constexpr auto _FREQUENCY               = 10000;
 constexpr auto _PERIOD                  = F_CPU / _FREQUENCY;
+
+volatile uint8_t pulse_width = 10;
 
 constexpr uint32_t get_normalize_width(const uint32_t width)
 {
@@ -29,7 +31,7 @@ inline void pwm_init()
 
     PWMGenConfigure(PWM0_BASE, PWM_GEN_0, PWM_GEN_MODE_DOWN);
     PWMGenPeriodSet(PWM0_BASE, PWM_GEN_0, _PERIOD);
-    PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, get_normalize_width(50));
+    PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, get_normalize_width(pulse_width));
     PWMOutputState(PWM0_BASE, PWM_OUT_0_BIT, true);
     PWMGenEnable(PWM0_BASE, PWM_GEN_0);
 
@@ -39,4 +41,4 @@ inline void pwm_init()
 };
 
 
-#endif /* INCLUDE_PWM_CORE_H_ */
+#endif /* INC_PWM_CORE_H_ */
